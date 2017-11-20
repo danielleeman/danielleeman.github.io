@@ -29,7 +29,7 @@ var baseUrl = 'https://razortracking.net';
 				if (result.ErrorDetail) {
 					alert(result.ErrorDetail.toString());
 				}
-
+				console.log(result.AuthenticationStatus.toString());
 				$("#status").text(result.AuthenticationStatus.toString());
 				$("#token").text(result.Token.toString());
 				$("#tokenInput, #locationTokenInput").val(result.Token.toString());
