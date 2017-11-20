@@ -1,0 +1,127 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+// var baseUrl = 'http://development.razortracking.net';
+var baseUrl = 'http://localhost:6700';
+
+var baseUrl = '';
+// $(document).ready(function() {
+// 	$("#getTokenButton").click(function() {
+		var request = {
+			"userName": '9990-admin',
+			"password": '9990-admin'
+		};
+		$.ajax({
+			url: baseUrl + '/Services/API/RazorTrackingApi.svc/Authenticate',
+			crossDomain: true,
+			type: 'POST',
+			contentType: "application/json;charset=utf-8",
+			cache: false,
+			datatype: 'json',
+			data: JSON.stringify(request),
+			dataFilter: function(data) {
+				var unwrapped = eval('(' + data + ')');
+				if (unwrapped.hasOwnProperty('d'))
+					return unwrapped.d;
+				else
+					return unwrapped;
+			},
+			success: function(result) {
+				if (result.ErrorDetail) {
+					alert(result.ErrorDetail.toString());
+				}
+
+				$("#status").text(result.AuthenticationStatus.toString());
+				$("#token").text(result.Token.toString());
+				$("#tokenInput, #locationTokenInput").val(result.Token.toString());
+			},
+			error: function(response) {
+				console.log(response);
+			}
+		});
+	// });
+	$("#getVehiclesButton").click(function() {
+		var request = {
+			"token": $("#tokenInput").val()
+		};
+		$.ajax({
+			url: baseUrl + '/Services/API/RazorTrackingApi.svc/GetVehicles',
+			crossDomain: true,
+			type: 'POST',
+			contentType: "application/json;charset=utf-8",
+			cache: false,
+			datatype: 'json',
+			data: JSON.stringify(request),
+			dataFilter: function(data) {
+				var unwrapped = eval('(' + data + ')');
+				if (unwrapped.hasOwnProperty('d'))
+					return unwrapped.d;
+				else
+					return unwrapped;
+			},
+			beforeSend: function() {
+				$("#vehiclesList").empty();
+			},
+			success: function(result) {
+				if (result.ErrorDetail) {
+					alert(result.ErrorDetail.toString());
+				}
+
+				var vehicleIds = new Array();
+				for (var i = 0; i < result.length; i++) {
+					$("#vehiclesList").append("[" + i + "]:" + JSON.stringify(result[i]) + "<br/>");
+					vehicleIds.push(result[i]["VehicleId"]);
+				}
+
+				$("#vehicleIds").text(JSON.stringify(vehicleIds));
+			},
+			error: function(response) {
+				console.log(response);
+			}
+		});
+	});
+	$("#getCurrentPositionsButton").click(function() {
+		var request = {
+			"token": $("#tokenInput").val(),
+			"vehicleIds": JSON.parse($("#vehicleIds").val())
+		};
+		$.ajax({
+			url: baseUrl + '/Services/API/RazorTrackingApi.svc/GetCurrentPosition',
+			crossDomain: true,
+			type: 'POST',
+			contentType: "application/json;charset=utf-8",
+			traditional: true,
+			cache: false,
+			datatype: 'json',
+			data: JSON.stringify(request),
+			dataFilter: function(data) {
+				var unwrapped = eval('(' + data + ')');
+				if (unwrapped.hasOwnProperty('d'))
+					return unwrapped.d;
+				else
+					return unwrapped;
+			},
+			beforeSend: function() {
+				$("#positionsList").empty();
+			},
+			success: function(result) {
+				if (result.ErrorDetail) {
+					alert(result.ErrorDetail.toString());
+				}
+
+				for (var i = 0; i < result.length; i++) {
+					$("#positionsList").append("[" + i + "]:" + JSON.stringify(result[i]) + "<br/>");
+				}
+			},
+			error: function(response) {
+				console.log(response);
+			}
+		});
+	});
+// });
+
+function test(){
+console.log("Yay")
+}
+
+var test1 = test();
+</script>
